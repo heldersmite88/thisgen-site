@@ -4,12 +4,17 @@
   var WIX = 'https://healthdeducation.wixsite.com/treinamento-crossfit';
   var p = decodeURIComponent(location.pathname).toLowerCase().replace(/\/+$/, '');
   var map = {
-    '/aulas': '/#modalidades', '/treinar-na-thisgen': '/#modalidades',
+    '/aulas': '/#modalidades', '/treinar-na-thisgen': '/#modalidades', '/kick-fight': '/#modalidades',
     '/horário': '/#visita', '/horario': '/#visita',
     '/avaliação-experimental': '/#metodo', '/service-page/avaliação-coaching': '/#metodo',
-    '/pricing-plans/planos': '/#precos', '/service-page/aula-experimental-1': '/#precos'
+    '/pricing-plans/planos': '/#precos', '/service-page/aula-experimental-1': '/#precos',
+    '/convite': '/convite', '/referral': '/convite'
   };
-  var dest = map[p] || (/^\/service-page\//.test(p) ? '/#modalidades' : WIX + location.pathname + location.search);
+  // Páginas encerradas: Mente Primeiro, Thisgen 90, Black Week, grupos, envio de fotos
+  var fechadas = /^\/(mente-primeiro|quiz-mente-primeiro|menteprimeiro-anamnese|calculadora-?mente-?primeiro|calculadoramenteprimeiro|black-week|groups|group\/|envio-fotos-video|whatsapp-eventos|event-details\/thisgen-90)/;
+  // Eventos e loja continuam na Wix até ao fim dos eventos já à venda
+  var wix = /^\/(eventos|event-details\/|gift-card|product-page\/|category\/)/;
+  var dest = map[p] || (/^\/service-page\//.test(p) ? '/#modalidades' : fechadas.test(p) ? '/' : wix.test(p) ? WIX + location.pathname + location.search : '/');
   location.replace(dest);
 })();
 </script>
