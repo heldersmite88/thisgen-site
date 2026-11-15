@@ -42,6 +42,16 @@
     gtag('config', GA_ID, { anonymize_ip: true });
     var s = document.createElement('script'); s.async = true;
     s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID; document.head.appendChild(s);
+    loadPixel();
+  }
+  // Pixel da Meta (só depois de aceitar cookies)
+  var PIXEL_ID = '8668712054';
+  function loadPixel() {
+    if (window.fbq) return;
+    !function (f, b, e, v, n, t, s) { if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = []; t = b.createElement(e); t.async = !0; t.src = v;
+      s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s); }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', PIXEL_ID); fbq('track', 'PageView');
   }
   var box = document.getElementById('cookie');
   var c = getC();
@@ -58,6 +68,7 @@
       : /comprar_plano/.test(href) ? 'acesso_livre' : /aula_avulso/.test(href) ? 'treino_avulso'
       : /novo_registo/.test(href) ? 'inscricao' : /pedir_contacto/.test(href) ? 'pedido_contacto' : 'outro';
     gtag('event', dest === 'whatsapp' ? 'clique_whatsapp' : 'clique_regybox', { cta_local: a.getAttribute('data-cta'), destino: dest, transport_type: 'beacon' });
+    if (window.fbq) fbq('track', dest === 'whatsapp' ? 'Contact' : dest === 'aula_experimental' ? 'Schedule' : dest === 'pedido_contacto' ? 'Lead' : dest === 'acesso_livre' || dest === 'treino_avulso' ? 'InitiateCheckout' : dest === 'inscricao' ? 'CompleteRegistration' : 'Lead', { content_name: a.getAttribute('data-cta') });
   });
 })();
 
