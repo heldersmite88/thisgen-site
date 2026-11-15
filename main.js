@@ -60,3 +60,40 @@
     gtag('event', dest === 'whatsapp' ? 'clique_whatsapp' : 'clique_regybox', { cta_local: a.getAttribute('data-cta'), destino: dest, transport_type: 'beacon' });
   });
 })();
+
+// Pop-up de lead: formulário "Pedir para ser contactado" da Regybox (integração 13)
+(function () {
+  var pop = document.getElementById('leadpop'); if (!pop) return;
+  var KEY = 'thisgen_leadpop', DIAS = 7, ATRASO = 6000;
+  var REGY = 'https://www.regibox.pt/php8/admin/modulos/crm/site_integrations/pedir_contacto.php?id_box=128&id_int=13&acs=dd1ad5ad960f1ad913954e41e91376518006284282839e5094081f6eb7e49fdb&site=s';
+  function get() { try { return Number(localStorage.getItem(KEY)) || 0; } catch (e) { return 0; } }
+  function set() { try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {} }
+  function ev(n) { if (window.gtag) gtag('event', n, { cta_local: 'popup' }); }
+  if (Date.now() - get() < DIAS * 864e5) return;
+  var aberto = false, carregado = false, ultimoFoco = null;
+  function carregar() {
+    if (carregado) return; carregado = true;
+    var d = document.createElement('div'); d.className = 'regy-int'; d.setAttribute('data-regy', REGY);
+    document.getElementById('leadpop-form').appendChild(d);
+    var s = document.createElement('script'); s.async = true;
+    s.src = 'https://www.regibox.pt/php8/admin/modulos/crm/site_integrations/regy2.js';
+    document.body.appendChild(s);
+  }
+  function abrir() {
+    if (aberto || Date.now() - get() < DIAS * 864e5) return;
+    if (document.getElementById('cookie').classList.contains('show')) { setTimeout(abrir, 4000); return; }
+    aberto = true; set(); carregar(); ultimoFoco = document.activeElement;
+    pop.hidden = false; requestAnimationFrame(function () { pop.classList.add('show'); });
+    pop.querySelector('.lead-pop__x').focus(); ev('popup_lead_aberto');
+  }
+  function fechar() {
+    pop.classList.remove('show'); setTimeout(function () { pop.hidden = true; }, 250);
+    if (ultimoFoco) ultimoFoco.focus(); ev('popup_lead_fechado');
+  }
+  pop.addEventListener('click', function (e) { if (e.target === pop || e.target.hasAttribute('data-close')) fechar(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !pop.hidden) fechar(); });
+  // Quem já clicou para marcar não precisa do pop-up
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-cta]')) set(); });
+  setTimeout(abrir, ATRASO);
+  document.addEventListener('mouseout', function (e) { if (!e.relatedTarget && e.clientY < 5) abrir(); });
+})();
